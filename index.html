@@ -1,1 +1,48 @@
-Hello World
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+  <canvas id="myChart" width="10" height="10"></canvas>
+<script>
+  fetch("https://pomber.github.io/covid19/timeseries.json")
+    .then(response => response.json())
+    .then(data => {
+      let activeCases = new Map();
+
+
+      data["Germany"].forEach(({ date, confirmed, recovered, deaths }) => {
+        activeCases.set(date, confirmed - recovered - deaths);
+      });
+
+      return activeCases;
+    })
+    .then(activeCases => {
+      drawChart(activeCases);
+    });
+
+    let drawChart = (activeCases) => {
+      console.log(Array.from(activeCases.values()));
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: Array.from(activeCases.keys()),
+              datasets: [{
+                  data: Array.from(activeCases.values()),
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255, 99, 132, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          }
+      });
+    }
+
+
+</script>
+</head>
+
+
+</html>
