@@ -6,33 +6,68 @@
   fetch("https://pomber.github.io/covid19/timeseries.json")
     .then(response => response.json())
     .then(data => {
-      let activeCases = new Map();
+      let cases = new Map();
 
 
       data["Germany"].forEach(({ date, confirmed, recovered, deaths }) => {
-        activeCases.set(date, confirmed - recovered - deaths);
+        cases.set(date, {
+            'active': confirmed - recovered - deaths,
+            'confirmed': confirmed,
+            'recovered': recovered,
+            'deaths': deaths
+        });
       });
 
-      return activeCases;
+      return cases
     })
-    .then(activeCases => {
-      drawChart(activeCases);
+    .then( (cases) => {
+      drawChart(cases);
     });
 
-    let drawChart = (activeCases) => {
-      console.log(Array.from(activeCases.values()));
+    let drawChart = (cases) => {
+      //var horst = Array.from(cases.values()).map(x => [x.active, x.confirmed, x.recovered, x.deaths]);
+      //debugger;
       var ctx = document.getElementById('myChart').getContext('2d');
       var myChart = new Chart(ctx, {
           type: 'line',
           data: {
-              labels: Array.from(activeCases.keys()),
+              labels: Array.from(cases.keys()),
               datasets: [{
-                  data: Array.from(activeCases.values()),
+                label: "Confirmed",
+                data: Array.from(cases.values()).map(x => x.confirmed),
+                borderColor: [
+                    'rgb(250,201,184)'
+                ],
+                borderWidth: 2,
+                fill: false
+              },{
+                label: "Deaths",
+                data: Array.from(cases.values()).map(x => x.deaths),
+                backgroundColor: [
+                    'rgba(16,11,0,1)'
+                ],
+                borderColor: [
+                    'rgba(16,11,0,1)'
+                ],
+                borderWidth: 1
+              },{
+                label: "Recovered",
+                data: Array.from(cases.values()).map(x => x.recovered),
+                backgroundColor: [
+                    'rgb(133,203,51)'
+                ],
+                borderColor: [
+                    'rgb(133,203,51)'
+                ],
+                borderWidth: 1
+              },{
+                  label: "Active",
+                  data: Array.from(cases.values()).map(x => x.active),
                   backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)'
+                      'rgba(0, 255, 0, 1)'
                   ],
                   borderColor: [
-                      'rgba(255, 99, 132, 1)'
+                      'rgba(0, 255, 0, 1)'
                   ],
                   borderWidth: 1
               }]
