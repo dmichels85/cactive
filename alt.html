@@ -1,0 +1,81 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+  <canvas id="myChart" width="10" height="10"></canvas>
+<script>
+  fetch("https://pomber.github.io/covid19/timeseries.json")
+    .then(response => response.json())
+    .then(data => {
+      let cases = new Map();
+
+      var prev = {
+        'confirmed': 0,
+        'recovered': 0,
+        'deaths': 0
+      };
+      data["Germany"].forEach(({ date, confirmed, recovered, deaths }) => {
+        let c = confirmed - prev.confirmed;
+        let r = recovered - prev.recovered;
+        let d = deaths - prev.deaths;
+
+        prev.confirmed = confirmed;
+        prev.recovered = recovered;
+        prev.deaths = deaths;
+
+        cases.set(date, {
+            'confirmed': c,
+            'recovered': r,
+            'deaths': d
+        });
+
+      });
+
+      return cases
+    })
+    .then( (cases) => {
+      debugger;
+      drawChart(cases);
+    });
+
+    let drawChart = (cases) => {
+      //var horst = Array.from(cases.values()).map(x => [x.active, x.confirmed, x.recovered, x.deaths]);
+      //debugger;
+
+      var color = Chart.helpers.color;
+
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: Array.from(cases.keys()),
+              datasets: [{
+                label: "Confirmed",
+                data: Array.from(cases.values()).map(x => x.confirmed),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+              },{
+                label: "Recovered",
+                data: Array.from(cases.values()).map(x => x.recovered),
+                backgroundColor: [
+                    'rgba(0, 255, 0, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(0, 255, 0, 1)'
+                ],
+                borderWidth: 1
+              }]
+          }
+      });
+    }
+
+
+</script>
+</head>
+
+
+</html>
