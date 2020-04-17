@@ -1,15 +1,15 @@
 <html>
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
-  <canvas id="myChart" width="10" height="10"></canvas>
-<script>
+  <link rel="stylesheet" type="text/css" href="css/skeleton.css">
+  <script>
   fetch("https://pomber.github.io/covid19/timeseries.json")
     .then(response => response.json())
     .then(data => {
       let cases = new Map();
 
 
-      data["Germany"].forEach(({ date, confirmed, recovered, deaths }) => {
+      data["Germany"].filter( ({ date, confirmed, recovered, deaths }) => Date.parse(date) >= 1583017200000 ).forEach(({ date, confirmed, recovered, deaths }) => {
         cases.set(date, {
             'active': confirmed - recovered - deaths,
             'confirmed': confirmed,
@@ -33,15 +33,15 @@
           data: {
               labels: Array.from(cases.keys()),
               datasets: [{
-                label: "Confirmed",
+                label: "Gemeldete Fälle",
                 data: Array.from(cases.values()).map(x => x.confirmed),
                 borderColor: [
-                    'rgb(250,201,184)'
+                    'rgb(255,29,21)'
                 ],
                 borderWidth: 2,
                 fill: false
               },{
-                label: "Deaths",
+                label: "Verstorben",
                 data: Array.from(cases.values()).map(x => x.deaths),
                 backgroundColor: [
                     'rgba(16,11,0,1)'
@@ -51,23 +51,21 @@
                 ],
                 borderWidth: 1
               },{
-                label: "Recovered",
+                label: "Geheilt",
                 data: Array.from(cases.values()).map(x => x.recovered),
-                backgroundColor: [
-                    'rgb(133,203,51)'
-                ],
                 borderColor: [
-                    'rgb(133,203,51)'
+                    'rgb(255,166,48)'
                 ],
-                borderWidth: 1
+                borderWidth: 2,
+                fill: false
               },{
-                  label: "Active",
+                  label: "Aktive Fälle",
                   data: Array.from(cases.values()).map(x => x.active),
                   backgroundColor: [
-                      'rgba(0, 255, 0, 1)'
+                      'rgba(33,118,174,0.2)'
                   ],
                   borderColor: [
-                      'rgba(0, 255, 0, 1)'
+                      'rgb(33,118,174)'
                   ],
                   borderWidth: 1
               }]
@@ -78,6 +76,18 @@
 
 </script>
 </head>
+<body>
+  <div class="container">
+    <div class="row">
+      <center>
+        <h1>Covid19 Verlauf in Deutschland</h1>
+        <h6>Seit 1. März 2020</h6>
+      </center>
+    </div>
+    <div class="row">
+      <canvas id="myChart" width="100px" height="100px"></canvas>
+    </div>
 
-
+  </div>
+</body>
 </html>
